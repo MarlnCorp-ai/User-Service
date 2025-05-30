@@ -8,6 +8,9 @@ public interface UserService {
 
     UserDTO createUser(UserDTO userDTO);
     List<UserDTO> getAllUsers();
+    UserDTO updateUser(UserDTO user, String userId);
+    UserDTO getByUserId(String userId);
+    void deleteUser(String userId);
 
 
 }
