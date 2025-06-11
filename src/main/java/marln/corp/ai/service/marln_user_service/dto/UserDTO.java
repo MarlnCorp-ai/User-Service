@@ -11,6 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -50,4 +51,8 @@ public class UserDTO {
     private String passwordHash;
     @NotEmpty
     private String departmentId;
+    @NotEmpty
+    private String roleId;
+    @NotEmpty
+    private List<String> permissionIds;
 }

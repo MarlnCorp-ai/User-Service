@@ -6,8 +6,10 @@ import marln.corp.ai.service.marln_user_service.assembler.UserMapper;
 import marln.corp.ai.service.marln_user_service.dao.UserRepository;
 import marln.corp.ai.service.marln_user_service.dto.UserDTO;
 import marln.corp.ai.service.marln_user_service.entity.User;
+import marln.corp.ai.service.marln_user_service.restcall.RestCall;
 import marln.corp.ai.service.marln_user_service.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,13 +36,22 @@ public class UserServiceImpl implements UserService {
     @Autowired
     HttpServletRequest request;
 
+    @Autowired
+    RestCall restCall;
+
 
     @Override
     public UserDTO createUser(UserDTO userDTO) {
         userDTO.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
         User user = userMapper.userDTOToUser(userDTO);
         user.setCreatedBy(request.getHeader("userId"));
-        return userMapper.userToUserDTO(userRepository.save(user));
+        UserDTO savedUser = userMapper.userToUserDTO(userRepository.save(user));
+
+        //Assign roles to user
+        //Exception handling needs to be added here
+         restCall.assignRoles(savedUser.getId(), userDTO.getRoleId(), userDTO.getPermissionIds());
+
+        return savedUser;
     }
 
     @Override
