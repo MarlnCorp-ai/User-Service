@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
         //Assign roles to user
         //Exception handling needs to be added here
-         restCall.assignRoles(savedUser.getId(), userDTO.getRoleId(), userDTO.getPermissionIds());
+         restCall.assignRoles(savedUser.getId(), userDTO.getUserRole(), userDTO.getUserPermissions());
 
         return savedUser;
     }

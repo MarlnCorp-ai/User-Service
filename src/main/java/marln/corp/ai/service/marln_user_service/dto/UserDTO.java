@@ -33,6 +33,10 @@ public class UserDTO {
     private String userFirstName;
 
     private String userMiddleName;
+
+    @NotEmpty
+    @Size(min = 2, message = "Username must be min of 2 character")
+    private String userLastName;
     private String createdBy;
     private String updatedBy;
     private String createdAt;
@@ -43,16 +47,12 @@ public class UserDTO {
 
     private LocalDateTime lastActive;
 
-    @NotEmpty
-    @Size(min = 2, message = "Username must be min of 2 character")
-    private String userLastName;
+
     @NotEmpty
     @Size(min = 5, max = 20, message = "Password must be minimum of 5 and a max of 20 character")
     private String passwordHash;
     @NotEmpty
     private String departmentId;
     @NotEmpty
-    private String roleId;
-    @NotEmpty
-    private List<String> permissionIds;
+    private List<String> userPermissions;
 }
