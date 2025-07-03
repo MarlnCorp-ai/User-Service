@@ -13,9 +13,6 @@ public class RestCallImpl implements RestCall{
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-//    @Autowired
-    UserRoleRequestDto userRoleRequestDto;
-
     @Autowired
     HttpServletRequest request;
 
@@ -23,7 +20,7 @@ public class RestCallImpl implements RestCall{
     public void assignRoles(String userId, String roleId, List<String> permissionList) {
 try {
     String url = "http://marln-rbac-service/rbac/user";
-
+    UserRoleRequestDto userRoleRequestDto = new UserRoleRequestDto();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     userRoleRequestDto.setUserId(userId);
