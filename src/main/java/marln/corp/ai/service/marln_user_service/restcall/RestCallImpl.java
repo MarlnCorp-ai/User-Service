@@ -4,15 +4,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import marln.corp.ai.service.marln_user_service.dto.UserRoleRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
+@Component
 public class RestCallImpl implements RestCall{
 
-    @Autowired
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    @Autowired
+//    @Autowired
     UserRoleRequestDto userRoleRequestDto;
 
     @Autowired
