@@ -65,6 +65,10 @@ public class User implements UserDetails {
     @Column(name = "last_active")
     private LocalDateTime lastActive;
 
+    @Column(name = "course_id", nullable = false)
+    private String courseId;
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

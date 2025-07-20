@@ -46,13 +46,13 @@ public class UserDTO {
     private Boolean isDeleted = false;
 
     private LocalDateTime lastActive;
-
-
     @NotEmpty
     @Size(min = 5, max = 20, message = "Password must be minimum of 5 and a max of 20 character")
     private String passwordHash;
     @NotEmpty
     private String departmentId;
+    @NotEmpty
+    private String courseId;
     @NotEmpty
     private List<String> userPermissions;
 }
