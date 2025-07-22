@@ -11,7 +11,8 @@ import java.util.List;
 @Component
 public class RestCallImpl implements RestCall{
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Autowired
     HttpServletRequest request;
