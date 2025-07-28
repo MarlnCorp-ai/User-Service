@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import marln.corp.ai.service.marln_user_service.exception.InvalidTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,14 +44,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }catch (IllegalArgumentException e)
             {
                 System.out.println("IllegalArgumentException : " +e.getMessage());
+                throw new InvalidTokenException("Invalid token format");
             }
             catch (ExpiredJwtException e)
             {
                 System.out.println("ExpiredJwtException : " +e.getMessage());
+                throw new InvalidTokenException("Token has expired");
             }
             catch (MalformedJwtException e)
             {
                 System.out.println("MalformedJwtException : " +e.getMessage());
+                throw new InvalidTokenException("Malformed token");
             }
         }else {
             System.out.println("JWT Token does not starts with Bearer");
@@ -70,6 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             else {
                 System.out.println("Invalid token");
+                throw new InvalidTokenException("Token validation failed");
             }
         }else {
             System.out.println("Username is null or context is not null");

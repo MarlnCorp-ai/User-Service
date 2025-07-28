@@ -2,6 +2,7 @@ package marln.corp.ai.service.marln_user_service.restcall;
 
 import jakarta.servlet.http.HttpServletRequest;
 import marln.corp.ai.service.marln_user_service.dto.UserRoleRequestDto;
+import marln.corp.ai.service.marln_user_service.exception.ExternalServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,7 @@ try {
 {
     System.out.println("EXCEPTION in restcall while storing user role : " +ex);
     ex.printStackTrace();
+    throw new ExternalServiceException("RBAC Service", "Failed to assign roles to user: " + ex.getMessage(), ex);
 }
 
     }

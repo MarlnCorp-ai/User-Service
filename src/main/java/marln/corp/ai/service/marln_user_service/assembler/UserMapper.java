@@ -12,7 +12,7 @@ public class UserMapper {
 
     @Autowired
     ModelMapper modelMapper;
-
+    
     @PostConstruct
     public void initMappings() {
         // DTO → Entity custom mapping

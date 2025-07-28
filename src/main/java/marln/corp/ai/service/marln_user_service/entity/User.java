@@ -5,17 +5,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @ToString
 public class User implements UserDetails {
@@ -44,7 +42,7 @@ public class User implements UserDetails {
     @Column(name = "user_created_at",nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-   @Column(name = "department_id", nullable = false)
+    @Column(name = "department_id", nullable = false)
     private String departmentId;
 
     @Column(name = "created_by", nullable = false)
@@ -67,6 +65,13 @@ public class User implements UserDetails {
 
     @Column(name = "course_id", nullable = false)
     private String courseId;
+
+    // Transient fields for role and permissions (not stored in database)
+    @Transient
+    private String userRole;
+
+    @Transient
+    private List<String> userPermissions;
 
 
     @Override

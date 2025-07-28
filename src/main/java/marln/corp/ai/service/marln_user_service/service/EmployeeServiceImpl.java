@@ -5,6 +5,7 @@ import marln.corp.ai.service.marln_user_service.dao.EmployeeRepository;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeHierarchyDTO;
 import marln.corp.ai.service.marln_user_service.entity.Employee;
+import marln.corp.ai.service.marln_user_service.exception.EmployeeNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,7 +48,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDTO getEmployeeById(String id) {
         return repository.findById(id)
                 .map(this::mapToDTO)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     @Override
@@ -60,7 +61,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDTO updateEmployee(String id, EmployeeDTO dto) {
         Employee emp = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
         emp.setEmployeeName(dto.getEmployeeName());
         emp.setReportingManagerId(dto.getReportingManagerId());
@@ -73,13 +74,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployee(String id) {
+        // Check if employee exists before deleting
+        if (!repository.existsById(id)) {
+            throw new EmployeeNotFoundException(id);
+        }
         repository.deleteById(id);
     }
 
     @Override
     public EmployeeHierarchyDTO getEmployeeHierarchy(String employeeId) {
         Employee employee = repository.findById(employeeId)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         return buildHierarchy(employee);
     }
