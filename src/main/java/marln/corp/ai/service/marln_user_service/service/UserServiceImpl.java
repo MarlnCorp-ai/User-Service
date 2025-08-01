@@ -60,8 +60,6 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.userDTOToUser(userDTO);
         user.setCreatedBy(request.getHeader("userId"));
         user.setUpdatedBy(request.getHeader("userId"));
-        user.setUserRole(userDTO.getUserRole());
-        user.setUserPermissions(userDTO.getUserPermissions());
         System.out.println("UserEntity before saving : " +user);
         UserDTO savedUser = userMapper.userToUserDTO(userRepository.save(user));
         System.out.println("UserEntity after saving : " + savedUser);

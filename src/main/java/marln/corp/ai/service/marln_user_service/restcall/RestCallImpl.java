@@ -46,7 +46,7 @@ try {
 {
     System.out.println("EXCEPTION in restcall while storing user role : " +ex);
     ex.printStackTrace();
-    throw new ExternalServiceException("RBAC Service", "Failed to assign roles to user: " + ex.getMessage(), ex);
+    throw new ExternalServiceException("marln-rbac-service", "Failed to assign roles to user: " + ex.getMessage(), ex);
 }
 
     }
