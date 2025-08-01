@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: marln-user-service
+
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://marln-database-dev.c7usmyc2yoib.ap-south-1.rds.amazonaws.com:5432/postgres
+    username: MarlnDev
+    password: Password01
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: user_data
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    schemas: user_data  # Only specify what's different
+    baseline-version: 0
+    validate-on-migrate: true
+    clean-disabled: true
+server:
+  port: 8090
+
+eureka:
+  client:
+    fetch-registry: true
+    service-url:
+      default-zone: http://ec2-13-233-240-95.ap-south-1.compute.amazonaws.com:8761/eureka
+
+logging:
+  file:
+    name: /var/log/app/user.log
