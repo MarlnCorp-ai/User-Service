@@ -32,7 +32,7 @@ eureka:
   client:
     fetch-registry: true
     service-url:
-      default-zone: http://ec2-13-233-240-95.ap-south-1.compute.amazonaws.com:8761/eureka
+      defaultZone: http://ec2-13-233-240-95.ap-south-1.compute.amazonaws.com:8761/eureka
 
 logging:
   file:

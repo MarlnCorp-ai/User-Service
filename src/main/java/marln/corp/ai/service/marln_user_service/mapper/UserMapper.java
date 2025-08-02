@@ -1,3 +1,4 @@
+/*
 package marln.corp.ai.service.marln_user_service.mapper;
 
 import marln.corp.ai.service.marln_user_service.dto.UserDTO;
@@ -21,3 +22,4 @@ public class UserMapper {
         return modelMapper.map(user,UserDTO.class);
     }
 }
+*/

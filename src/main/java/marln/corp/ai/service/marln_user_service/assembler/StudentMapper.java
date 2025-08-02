@@ -4,11 +4,12 @@ import marln.corp.ai.service.marln_user_service.dto.StudentDTO;
 import marln.corp.ai.service.marln_user_service.entity.Student;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Component
 public class StudentMapper {
 
     @Autowired
