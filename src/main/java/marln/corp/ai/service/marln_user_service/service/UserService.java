@@ -1,5 +1,6 @@
 package marln.corp.ai.service.marln_user_service.service;
 
+import marln.corp.ai.service.marln_user_service.dto.PasswordChangeDTO;
 import marln.corp.ai.service.marln_user_service.dto.UserDTO;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface UserService {
     void deleteUser(String userId);
 
 
+    String changePassword(PasswordChangeDTO passwordChangeDTO);
 }

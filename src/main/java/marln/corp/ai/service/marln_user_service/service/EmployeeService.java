@@ -1,8 +1,10 @@
 package marln.corp.ai.service.marln_user_service.service;
 
 import jakarta.transaction.Transactional;
+import marln.corp.ai.service.marln_user_service.dto.BulkUploadResponseDto;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeHierarchyDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,4 +20,5 @@ public interface EmployeeService {
         EmployeeDTO updateEmployee(String id, EmployeeDTO dto);
         void deleteEmployee(String id);
          EmployeeHierarchyDTO getEmployeeHierarchy(String employeeId);
+        public BulkUploadResponseDto uploadEmployeesFromCsv(MultipartFile file);
 }

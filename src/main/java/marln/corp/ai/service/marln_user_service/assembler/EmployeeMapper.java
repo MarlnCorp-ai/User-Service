@@ -1,9 +1,8 @@
 package marln.corp.ai.service.marln_user_service.assembler;
 
+import marln.corp.ai.service.marln_user_service.dto.EmployeeCsvDTO;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
-import marln.corp.ai.service.marln_user_service.dto.StudentDTO;
 import marln.corp.ai.service.marln_user_service.entity.Employee;
-import marln.corp.ai.service.marln_user_service.entity.Student;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,5 +41,9 @@ public class EmployeeMapper {
                 })
                 .collect(Collectors.toList());
 
+    }
+    public Employee employeeCSVDTOToEmployee(EmployeeCsvDTO employeeCsvDTO)
+    {
+        return mapper.map(employeeCsvDTO, Employee.class);
     }
 }

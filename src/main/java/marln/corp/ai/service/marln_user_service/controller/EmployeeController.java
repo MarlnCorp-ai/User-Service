@@ -1,10 +1,23 @@
 package marln.corp.ai.service.marln_user_service.controller;
 
 import lombok.RequiredArgsConstructor;
+import marln.corp.ai.service.marln_user_service.dto.BulkUploadResponseDto;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeHierarchyDTO;
 import marln.corp.ai.service.marln_user_service.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
+import marln.corp.ai.service.marln_user_service.service.EmployeeService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,35 +26,45 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmployeeController {
 
-    private final EmployeeService service;
+    private final EmployeeService employeeService;
 
     @PostMapping
-    public EmployeeDTO create(@RequestBody EmployeeDTO dto) {
-        return service.createEmployee(dto);
+    public ResponseEntity<EmployeeDTO> createEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
+        EmployeeDTO created = employeeService.createEmployee(employeeDTO);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public EmployeeDTO get(@PathVariable String id) {
-        return service.getEmployeeById(id);
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable String employeeId) {
+        EmployeeDTO employee = employeeService.getEmployeeById(employeeId);
+        return ResponseEntity.ok(employee);
     }
 
-    @GetMapping
-    public List<EmployeeDTO> getAll() {
-        return service.getAllEmployees();
+    @GetMapping("/designation/{designation}")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByDesignation(@PathVariable String designation) {
+        List<EmployeeDTO> employees = employeeService.getEmployeesByDesignation(designation);
+        return ResponseEntity.ok(employees);
     }
 
-    @PutMapping("/{id}")
-    public EmployeeDTO update(@PathVariable String id, @RequestBody EmployeeDTO dto) {
-        return service.updateEmployee(id, dto);
+    @PutMapping("/{userId}")
+    public ResponseEntity<EmployeeDTO> updateEmployee(
+            @PathVariable String userId,
+            @Valid @RequestBody EmployeeDTO employeeDTO) {
+        EmployeeDTO updated = employeeService.updateEmployee(userId, employeeDTO);
+        return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        service.deleteEmployee(id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable String userId) {
+        employeeService.deleteEmployee(userId);
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/hierarchy")
-    public EmployeeHierarchyDTO getHierarchy(@PathVariable String id) {
-        return service.getEmployeeHierarchy(id);
+    @PostMapping("/bulk-upload")
+    public ResponseEntity<BulkUploadResponseDto> uploadEmployeesFromCsv(
+            @RequestParam("file") MultipartFile file) {
+
+        BulkUploadResponseDto result = employeeService.uploadEmployeesFromCsv(file);
+        return ResponseEntity.ok(result);
     }
 }

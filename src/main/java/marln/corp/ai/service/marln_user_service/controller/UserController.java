@@ -2,6 +2,7 @@ package marln.corp.ai.service.marln_user_service.controller;
 
 
 import jakarta.validation.Valid;
+import marln.corp.ai.service.marln_user_service.dto.PasswordChangeDTO;
 import marln.corp.ai.service.marln_user_service.dto.UserDTO;
 import marln.corp.ai.service.marln_user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +40,11 @@ public class UserController {
     public ResponseEntity<?> getAllUsers()
     {
         return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @PutMapping
+    public ResponseEntity<String> updatePassword(@RequestBody PasswordChangeDTO passwordChangeDTO)
+    {
+        return  ResponseEntity.ok(userService.changePassword(passwordChangeDTO));
     }
 }

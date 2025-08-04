@@ -5,15 +5,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import marln.corp.ai.service.marln_user_service.assembler.UserMapper;
 import marln.corp.ai.service.marln_user_service.dao.UserRepository;
+import marln.corp.ai.service.marln_user_service.dto.PasswordChangeDTO;
 import marln.corp.ai.service.marln_user_service.dto.UserDTO;
 import marln.corp.ai.service.marln_user_service.entity.User;
-import marln.corp.ai.service.marln_user_service.exception.UserNotFoundException;
-import marln.corp.ai.service.marln_user_service.exception.UserAlreadyExistsException;
-import marln.corp.ai.service.marln_user_service.exception.ExternalServiceException;
+import marln.corp.ai.service.marln_user_service.exception.*;
 import marln.corp.ai.service.marln_user_service.restcall.RestCall;
 import marln.corp.ai.service.marln_user_service.utils.JwtUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,12 +21,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -108,5 +110,30 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(userId);
         }
         userRepository.deleteById(userId);
+    }
+
+    @Override
+    public String changePassword(PasswordChangeDTO passwordChangeDTO) {
+
+        String currentPasswordHash = userRepository.findPasswordByEmailId(passwordChangeDTO.getEmailId()).orElseThrow(
+                ()->new UserNotFoundException(" User not found with EmailId : "+passwordChangeDTO.getEmailId()));
+
+        if (!passwordEncoder.matches(passwordChangeDTO.getExistingPassword(), currentPasswordHash)) {
+            log.warn("Invalid current password provided for user ID: {}", passwordChangeDTO.getExistingPassword());
+            throw new InvalidPasswordException("Current password is incorrect");
+        }
+        String newEncodedPassword = passwordEncoder.encode(passwordChangeDTO.getNewPassword());
+        int updateRow = userRepository.updateUserPassword(passwordChangeDTO.getEmailId(),
+                newEncodedPassword, LocalDateTime.now());
+
+        if(updateRow == 0)
+        {
+                log.error("No Rows has been affected, user might got deleted");
+                throw new RuntimeException("Failed to update password - user with emailId : "+passwordChangeDTO.getEmailId()
+                +" may have been deleted");
+        }
+        log.info("Password for User with emailId : " +passwordChangeDTO.getEmailId() +" has successfully been changed");
+
+        return "SUCCESS";
     }
 }

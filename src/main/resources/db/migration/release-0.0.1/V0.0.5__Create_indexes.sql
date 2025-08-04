@@ -31,4 +31,4 @@ CREATE INDEX idx_employees_active_dept ON employees(employee_status, job_city) W
 COMMENT ON INDEX idx_user_email IS 'Unique index for fast user lookup by email';
 COMMENT ON INDEX idx_user_type_active IS 'Composite index for filtering users by type and active status';
 COMMENT ON INDEX idx_student_roll_no IS 'Unique index for student roll number lookup';
-COMMENT ON INDEX idx_employee_id IS 'Unique index for employee ID lookup';
+COMMENT ON INDEX idx_employee_id IS 'Unique index for employee ID lookup';mv

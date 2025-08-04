@@ -7,20 +7,21 @@ import marln.corp.ai.service.marln_user_service.assembler.EmployeeMapper;
 import marln.corp.ai.service.marln_user_service.assembler.UserMapper;
 import marln.corp.ai.service.marln_user_service.dao.EmployeeRepository;
 import marln.corp.ai.service.marln_user_service.dao.UserRepository;
-import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
-import marln.corp.ai.service.marln_user_service.dto.EmployeeHierarchyDTO;
-import marln.corp.ai.service.marln_user_service.dto.UserDTO;
+import marln.corp.ai.service.marln_user_service.dto.*;
 import marln.corp.ai.service.marln_user_service.entity.Employee;
 import marln.corp.ai.service.marln_user_service.entity.User;
 import marln.corp.ai.service.marln_user_service.entity.UserType;
 import marln.corp.ai.service.marln_user_service.exception.EmployeeNotFoundException;
 import marln.corp.ai.service.marln_user_service.exception.ExternalServiceException;
 import marln.corp.ai.service.marln_user_service.restcall.RestCall;
+import marln.corp.ai.service.marln_user_service.utils.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -195,5 +196,88 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         return dto;
+    }
+
+    @Override
+    @Transactional
+    public BulkUploadResponseDto uploadEmployeesFromCsv(MultipartFile file) {
+        log.info("Starting CSV upload for employees, file: {}", file.getOriginalFilename());
+
+        // Validate file format
+        if (!CsvUtil.hasCSVFormat(file)) {
+            throw new IllegalArgumentException("File must be a CSV format");
+        }
+
+        List<String> successfulEmails = new ArrayList<>();
+        List<String> failedRecords = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+
+        try {
+            // Parse CSV to DTOs
+            List<EmployeeCsvDTO> csvEmployees = CsvUtil.csvToEmployees(file.getInputStream());
+
+            for (EmployeeCsvDTO csvEmployee : csvEmployees) {
+                try {
+                    // ===== STEP 1: CREATE AND SAVE USER FIRST =====
+                    if (userRepository.existsByEmail(csvEmployee.getEmail())) {
+                        failedRecords.add(csvEmployee.getEmail());
+                        errors.add("User already exists with email: " + csvEmployee.getEmail());
+                        continue;
+                    }
+
+                    if (employeeRepository.existsByEmployeeId(csvEmployee.getEmployeeId())) {
+                        failedRecords.add(csvEmployee.getEmail());
+                        errors.add("Employee already exists with ID: " + csvEmployee.getEmployeeId());
+                        continue;
+                    }
+
+                    // Create User entity
+                    User user = new User();
+                    user.setId(UUID.randomUUID().toString());
+                    user.setEmail(csvEmployee.getEmail());
+                    user.setUserFirstName(csvEmployee.getUserFirstName());
+                    user.setUserMiddleName(csvEmployee.getUserMiddleName());
+                    user.setUserLastName(csvEmployee.getUserLastName());
+                    user.setPasswordHash(passwordEncoder.encode(csvEmployee.getPassword()));
+                    user.setUserType(UserType.EMPLOYEE);
+                    user.setCreatedAt(LocalDateTime.now());
+                    user.setCreatedBy(csvEmployee.getCreatedBy());
+                    user.setUpdatedBy(csvEmployee.getCreatedBy());
+                    user.setIsActive(true);
+                    user.setIsDeleted(false);
+
+                    User savedUser = userRepository.save(user); // First save operation
+                    // ===== STEP 2: CREATE AND SAVE EMPLOYEE SECOND =====
+                    Employee employee = employeeMapper.employeeCSVDTOToEmployee(csvEmployee);
+                    employee.setUserId(savedUser.getId()); // Link to saved user
+                    employee.setUser(savedUser); // Set relationship for @MapsId
+                    employee.setCreatedAt(LocalDateTime.now());
+
+                    employeeRepository.save(employee); // Second save operation
+
+                    successfulEmails.add(csvEmployee.getEmail());
+                    log.info("Successfully created employee: {}", csvEmployee.getEmail());
+
+                } catch (Exception e) {
+                    failedRecords.add(csvEmployee.getEmail());
+                    errors.add("Error processing " + csvEmployee.getEmail() + ": " + e.getMessage());
+                    log.error("Failed to create employee: {}, Error: {}", csvEmployee.getEmail(), e.getMessage());
+                }
+            }
+
+            return BulkUploadResponseDto.builder()
+                    .message("CSV upload completed")
+                    .totalRecords(csvEmployees.size())
+                    .successfulRecords(successfulEmails.size())
+                    .failedRecords(failedRecords.size())
+                    .successfulEmails(successfulEmails)
+                    .failedRecordsList(failedRecords)
+                    .errors(errors)
+                    .build();
+
+        } catch (Exception e) {
+            log.error("Failed to process CSV file: {}", e.getMessage());
+            throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
+        }
     }
 }
