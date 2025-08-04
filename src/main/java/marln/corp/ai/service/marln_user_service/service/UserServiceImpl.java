@@ -115,7 +115,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String changePassword(PasswordChangeDTO passwordChangeDTO) {
 
-        String currentPasswordHash = userRepository.findPasswordByEmailId(passwordChangeDTO.getEmailId()).orElseThrow(
+        String currentPasswordHash = userRepository.findPasswordByEmail(passwordChangeDTO.getEmailId()).orElseThrow(
                 ()->new UserNotFoundException(" User not found with EmailId : "+passwordChangeDTO.getEmailId()));
 
         if (!passwordEncoder.matches(passwordChangeDTO.getExistingPassword(), currentPasswordHash)) {

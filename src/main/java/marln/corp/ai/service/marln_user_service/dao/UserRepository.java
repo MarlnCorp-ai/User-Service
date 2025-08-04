@@ -23,9 +23,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE u.isDeleted = false AND u.isActive = true")
     List<User> findAllActiveUsers();
 
-    Optional<String>  findPasswordByEmailId(@Param("emailId")String emailId);
+    Optional<String> findPasswordByEmail(@Param("email")String email);
 
     @Modifying
-    @Query("Update User u SET u.passwordHash = :passwordHash, u.updatedAt =  :updatedAt, where u.emailId = :emailId AND u.isDeleted = false")
-    int updateUserPassword(@Param("emailId") String emailId, @Param("passwordHash") String passwordHash, @Param("updatedAt") LocalDateTime updatedAt);
+    @Query("Update User u SET u.passwordHash = :passwordHash, u.updatedAt =  :updatedAt where u.email = :email AND u.isDeleted = false")
+    int updateUserPassword(@Param("email") String email, @Param("passwordHash") String passwordHash, @Param("updatedAt") LocalDateTime updatedAt);
 }
