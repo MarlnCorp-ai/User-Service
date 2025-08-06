@@ -15,7 +15,8 @@ CREATE TABLE users (
     updated_by VARCHAR(100) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     is_deleted BOOLEAN DEFAULT FALSE,
-    last_active TIMESTAMP
+    last_active TIMESTAMP,
+    version BIGINT DEFAULT 0 NOT NULL
 );
 
 -- Add table comments
@@ -23,3 +24,4 @@ COMMENT ON TABLE users IS 'Base user table containing common user information fo
 COMMENT ON COLUMN users.user_type IS 'Type of user: STUDENT, EMPLOYEE, or ADMIN';
 COMMENT ON COLUMN users.is_deleted IS 'Soft delete flag for maintaining data integrity';
 COMMENT ON COLUMN users.user_created_at IS 'Timestamp when user record was created';
+COMMENT ON COLUMN users.version IS 'Version number for optimistic locking to handle concurrent updates';

@@ -30,6 +30,9 @@ public class Employee {
     @Column(name = "user_id")
     private String userId;
 
+    @Version
+    private Long version;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -52,9 +55,6 @@ public class Employee {
 
     @Column(name = "hire_date")
     private LocalDate hireDate;
-
-    @Column(name = "salary", precision = 12, scale = 2)
-    private BigDecimal salary;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "employee_type", length = 20)

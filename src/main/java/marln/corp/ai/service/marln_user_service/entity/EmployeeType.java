@@ -4,12 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum EmployeeType {
-    FULL_TIME("Full Time"),
-    PART_TIME("Part Time"),
-    CONTRACT("Contract"),
-    INTERN("Intern"),
-    CONSULTANT("Consultant");
-
+    FULL_TIME("FULL_TIME"),
+    PART_TIME("PART_TIME"),
+    CONTRACT("CONTRACT"),
+    INTERN("INTERN"),
+    CONSULTANT("CONSULTANT");
     private final String displayName;
 
     EmployeeType(String displayName) {

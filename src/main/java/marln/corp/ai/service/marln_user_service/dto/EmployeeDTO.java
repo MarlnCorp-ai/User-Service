@@ -20,8 +20,6 @@ import java.time.LocalDateTime;
     @Builder
     public class EmployeeDTO {
 
-        private String userId;
-
         @NotBlank(message = "Employee ID is required")
         @Size(min = 3, max = 50, message = "Employee ID must be between 3 and 50 characters")
         private String employeeId;

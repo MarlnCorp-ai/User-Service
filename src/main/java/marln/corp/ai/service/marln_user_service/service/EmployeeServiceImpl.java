@@ -1,5 +1,6 @@
 package marln.corp.ai.service.marln_user_service.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import marln.corp.ai.service.marln_user_service.entity.User;
 import marln.corp.ai.service.marln_user_service.entity.UserType;
 import marln.corp.ai.service.marln_user_service.exception.EmployeeNotFoundException;
 import marln.corp.ai.service.marln_user_service.exception.ExternalServiceException;
+import marln.corp.ai.service.marln_user_service.exception.UserNotFoundException;
 import marln.corp.ai.service.marln_user_service.restcall.RestCall;
 import marln.corp.ai.service.marln_user_service.utils.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     RestCall restCall;
+    @Autowired
+    HttpServletRequest request;
 
 
 
@@ -70,6 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
+        String loggedInUser = request.getHeader("userId");
         log.info("Creating employee with ID: {}", employeeDTO.getEmployeeId());
 
         // Validation
@@ -85,17 +90,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         UserDTO userDTO = employeeDTO.getUser();
         userDTO.setUserType(UserType.EMPLOYEE);
         User user = userMapper.userDTOToUser(userDTO);
-        user.setId(UUID.randomUUID().toString());
         user.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
         user.setCreatedAt(LocalDateTime.now());
         user.setIsActive(true);
         user.setIsDeleted(false);
+        user.setCreatedBy(loggedInUser);
+        user.setUpdatedBy(loggedInUser);
 
         User savedUser = userRepository.save(user); // First save operation
         log.info("User created with ID: {}", savedUser.getId());
 
         // ===== STEP 2: CREATE AND SAVE EMPLOYEE SECOND =====
         Employee employee = employeeMapper.employeeDTOToEmployee(employeeDTO);
+        employee.setCreatedBy(loggedInUser);
+        employee.setUpdatedBy(loggedInUser);
         employee.setUserId(savedUser.getId()); // Link to saved user
         employee.setUser(savedUser); // Set relationship for @MapsId
 
@@ -157,10 +165,15 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteEmployee(String userId) {
         if (!employeeRepository.existsById(userId)) {
-            throw new RuntimeException("Employee not found with user ID: " + userId);
+            throw new RuntimeException("Employee not found for deletion with user ID: " + userId);
+        }
+        if(!userRepository.existsById(userId))
+        {
+            throw new UserNotFoundException("User not found for deletion with user ID: " + userId);
         }
 
         employeeRepository.deleteById(userId);
+        userRepository.deleteById(userId);
         // User will be deleted by cascade
         log.info("Employee deleted successfully with user ID: {}", userId);
     }
@@ -233,7 +246,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
                     // Create User entity
                     User user = new User();
-                    user.setId(UUID.randomUUID().toString());
                     user.setEmail(csvEmployee.getEmail());
                     user.setUserFirstName(csvEmployee.getUserFirstName());
                     user.setUserMiddleName(csvEmployee.getUserMiddleName());

@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(UserDTO userDTO) {
-        System.out.println("UserDTO : " +userDTO);
+        log.info("UserDTO : " +userDTO);
         
         // Check if user already exists with the same email
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
@@ -62,9 +62,9 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.userDTOToUser(userDTO);
         user.setCreatedBy(request.getHeader("userId"));
         user.setUpdatedBy(request.getHeader("userId"));
-        System.out.println("UserEntity before saving : " +user);
+        log.info("UserEntity before saving : " +user);
         UserDTO savedUser = userMapper.userToUserDTO(userRepository.save(user));
-        System.out.println("UserEntity after saving : " + savedUser);
+        log.info("UserEntity after saving : " + savedUser);
         
         //Assign roles to user
         try {

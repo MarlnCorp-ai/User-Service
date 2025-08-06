@@ -31,6 +31,9 @@ public class Student {
     @Column(name = "user_id")
     private String userId;
 
+    @Version
+    private Long version;
+
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

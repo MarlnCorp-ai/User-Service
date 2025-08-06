@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import marln.corp.ai.service.marln_user_service.dto.BulkUploadResponseDto;
 import marln.corp.ai.service.marln_user_service.dto.StudentDTO;
+import marln.corp.ai.service.marln_user_service.dto.StudentUpdateDTO;
 import marln.corp.ai.service.marln_user_service.service.StudentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,13 @@ public class StudentController {
         return ResponseEntity.ok(student);
     }
 
+    @GetMapping
+    public ResponseEntity<List<StudentDTO>> getAllStudents()
+    {
+        List<StudentDTO> studentDTOList = studentService.getAllStudents();
+        return ResponseEntity.ok(studentDTOList);
+    }
+
     @GetMapping("/program/{program}")
     public ResponseEntity<List<StudentDTO>> getStudentsByProgram(@PathVariable String program) {
         List<StudentDTO> students = studentService.getStudentsByProgram(program);
@@ -40,8 +48,8 @@ public class StudentController {
     @PutMapping("/{userId}")
     public ResponseEntity<StudentDTO> updateStudent(
             @PathVariable String userId,
-            @Valid @RequestBody StudentDTO studentDTO) {
-        StudentDTO updated = studentService.updateStudent(userId, studentDTO);
+            @Valid @RequestBody StudentUpdateDTO studentUpdateDTO) {
+        StudentDTO updated = studentService.updateStudent(userId, studentUpdateDTO);
         return ResponseEntity.ok(updated);
     }
 

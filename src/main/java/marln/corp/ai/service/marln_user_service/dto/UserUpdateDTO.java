@@ -1,7 +1,5 @@
 package marln.corp.ai.service.marln_user_service.dto;
 
-
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -11,22 +9,18 @@ import marln.corp.ai.service.marln_user_service.entity.UserType;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
+@AllArgsConstructor
+@Builder
 @ToString
-public class UserDTO {
-
-    private String id;
+public class UserUpdateDTO {
 
     @Email(message = "Email address is not valid")
-    @NotEmpty
     private String email;
-    @NotEmpty
     @Size(min = 2, message = "Username must be min of 2 character")
     private String userFirstName;
     private String userMiddleName;
-    @NotEmpty
     @Size(min = 2, message = "Username must be min of 2 character")
     private String userLastName;
     private String createdBy;
@@ -34,17 +28,13 @@ public class UserDTO {
     private String createdAt;
     private String updatedAt;
     private Boolean isActive = true;
-    @NonNull
     private UserType userType;
 
     private Boolean isDeleted = false;
 
     private LocalDateTime lastActive;
-    @NotEmpty
     @Size(min = 5, max = 20, message = "Password must be minimum of 5 and a max of 20 character")
     private String passwordHash;
-    @NotEmpty
     private String userRole;
-    @NotEmpty
     private List<String> userPermissions;
 }

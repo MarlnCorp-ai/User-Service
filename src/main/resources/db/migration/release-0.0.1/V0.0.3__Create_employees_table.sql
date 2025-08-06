@@ -19,7 +19,8 @@ CREATE TABLE employees (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     created_by VARCHAR(100),
-    updated_by VARCHAR(100)
+    updated_by VARCHAR(100),
+    version BIGINT DEFAULT 0 NOT NULL
 );
 
 -- Add constraints
@@ -32,3 +33,4 @@ COMMENT ON TABLE employees IS 'Employee-specific information linked to users tab
 COMMENT ON COLUMN employees.user_id IS 'Primary key and foreign key to users.id (shared PK with @MapsId)';
 COMMENT ON COLUMN employees.salary IS 'Employee salary with 2 decimal precision';
 COMMENT ON COLUMN employees.employee_type IS 'Employment type: full-time, part-time, contract, intern, consultant';
+COMMENT ON COLUMN employees.version IS 'Version number for optimistic locking to handle concurrent updates';

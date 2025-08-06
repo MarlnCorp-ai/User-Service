@@ -1,17 +1,17 @@
 package marln.corp.ai.service.marln_user_service.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import marln.corp.ai.service.marln_user_service.assembler.StudentMapper;
 import marln.corp.ai.service.marln_user_service.assembler.UserMapper;
 import marln.corp.ai.service.marln_user_service.dao.StudentRepository;
 import marln.corp.ai.service.marln_user_service.dao.UserRepository;
-import marln.corp.ai.service.marln_user_service.dto.BulkUploadResponseDto;
-import marln.corp.ai.service.marln_user_service.dto.StudentCsvDTO;
-import marln.corp.ai.service.marln_user_service.dto.StudentDTO;
-import marln.corp.ai.service.marln_user_service.dto.UserDTO;
+import marln.corp.ai.service.marln_user_service.dto.*;
 import marln.corp.ai.service.marln_user_service.entity.*;
 import marln.corp.ai.service.marln_user_service.exception.ExternalServiceException;
+import marln.corp.ai.service.marln_user_service.exception.StudentNotFoundException;
+import marln.corp.ai.service.marln_user_service.exception.UserNotFoundException;
 import marln.corp.ai.service.marln_user_service.restcall.RestCall;
 import marln.corp.ai.service.marln_user_service.utils.CsvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +42,13 @@ public class StudentServiceImpl implements StudentService{
     private PasswordEncoder passwordEncoder;
     @Autowired
     RestCall restCall;
+    @Autowired
+    HttpServletRequest request;
 
     @Transactional
     @Override
     public StudentDTO createStudent(StudentDTO studentDTO) {
+        String loggedInUser = request.getHeader("userId");
         log.info("Creating student with roll number: {}", studentDTO.getStudentRollNo());
 
         // Validation
@@ -59,15 +62,14 @@ public class StudentServiceImpl implements StudentService{
 
         // ===== STEP 1: CREATE AND SAVE USER FIRST =====
         UserDTO userDTO = studentDTO.getUser();
-        userDTO.setUserRole("STUDENT"); // Set user type
-
         User user = userMapper.userDTOToUser(userDTO);
-        user.setId(UUID.randomUUID().toString());
         user.setUserType(UserType.STUDENT);
         user.setPasswordHash(passwordEncoder.encode(userDTO.getPasswordHash()));
         user.setCreatedAt(LocalDateTime.now());
         user.setIsActive(true);
         user.setIsDeleted(false);
+        user.setCreatedBy(loggedInUser);
+        user.setUpdatedBy(loggedInUser);
 
         User savedUser = userRepository.save(user); // First save operation
         log.info("User created with ID: {}", savedUser.getId());
@@ -75,6 +77,8 @@ public class StudentServiceImpl implements StudentService{
         // ===== STEP 2: CREATE AND SAVE STUDENT SECOND =====
         Student student = studentMapper.studentDTOToStudent(studentDTO);
         student.setUserId(savedUser.getId()); // Link to saved user
+        student.setCreatedBy(loggedInUser);
+        student.setUpdatedBy(loggedInUser);
         student.setUser(savedUser); // Set relationship for @MapsId
         student.setCreatedAt(LocalDateTime.now());
 
@@ -84,6 +88,7 @@ public class StudentServiceImpl implements StudentService{
         try {
             restCall.assignRoles(savedUser.getId(), userDTO.getUserRole(), userDTO.getUserPermissions());
         } catch (Exception ex) {
+            log.info("Inside exception while calling rbac-service");
             userRepository.delete(user);
             studentRepository.delete(student);
             throw new ExternalServiceException("marln-rbac-service", "Failed to assign roles to user: " + ex.getMessage(), ex);
@@ -99,7 +104,7 @@ public class StudentServiceImpl implements StudentService{
     @Override
     public StudentDTO getStudentByRollNo(String rollNo) {
         Student student = studentRepository.findByStudentRollNoWithUser(rollNo)
-                .orElseThrow(() -> new RuntimeException("Student not found with roll number: " + rollNo));
+                .orElseThrow(() -> new StudentNotFoundException("Student not found with roll number: " + rollNo));
         return studentMapper.studentToStudentDTO(student);
     }
 
@@ -112,12 +117,14 @@ public class StudentServiceImpl implements StudentService{
 
     @Transactional
     @Override
-    public StudentDTO updateStudent(String userId, StudentDTO studentDTO) {
+    public StudentDTO updateStudent(String userId, StudentUpdateDTO studentDTO) {
+        log.info("Update request body {}",studentDTO.toString());
         Student existingStudent = studentRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Student not found with user ID: " + userId));
 
         studentMapper.updateStudentEntityFromDto(studentDTO, existingStudent);
         existingStudent.setUpdatedAt(LocalDateTime.now());
+        log.info("Existing Student after updated values : " + existingStudent.toString());
 
         Student updatedStudent = studentRepository.save(existingStudent);
         return studentMapper.studentToStudentDTO(updatedStudent);
@@ -127,10 +134,14 @@ public class StudentServiceImpl implements StudentService{
     @Override
     public void deleteStudent(String userId) {
         if (!studentRepository.existsById(userId)) {
-            throw new RuntimeException("Student not found with user ID: " + userId);
+            throw new StudentNotFoundException("Student not found for deletion with user ID: " + userId);
         }
 
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found for deletion with user ID: " + userId);
+        }
         studentRepository.deleteById(userId);
+        userRepository.deleteById(userId);
         // User will be deleted by cascade
         log.info("Student deleted successfully with user ID: {}", userId);
     }
@@ -170,7 +181,6 @@ public class StudentServiceImpl implements StudentService{
 
                     // Create User entity
                     User user = new User();
-                    user.setId(UUID.randomUUID().toString());
                     user.setEmail(csvStudent.getEmail());
                     user.setUserFirstName(csvStudent.getUserFirstName());
                     user.setUserMiddleName(csvStudent.getUserMiddleName());
@@ -217,5 +227,17 @@ public class StudentServiceImpl implements StudentService{
             log.error("Failed to process CSV file: {}", e.getMessage());
             throw new RuntimeException("Failed to process CSV file: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<StudentDTO> getAllStudents() {
+        log.info("Inside getAllStudents");
+        List<Student>studentList = studentRepository.findAll();
+        if(!studentList.isEmpty())
+        {
+            throw new StudentNotFoundException("No students Enrolled");
+        }
+        log.info("Student list is not empty");
+        return studentMapper.toStudentDTOList(studentList);
     }
 }

@@ -16,7 +16,8 @@ CREATE TABLE students (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     created_by VARCHAR(100),
-    updated_by VARCHAR(100)
+    updated_by VARCHAR(100),
+    version BIGINT DEFAULT 0 NOT NULL
 );
 
 -- Add constraints
@@ -29,3 +30,4 @@ COMMENT ON TABLE students IS 'Student-specific information linked to users table
 COMMENT ON COLUMN students.user_id IS 'Primary key and foreign key to users.id (shared PK with @MapsId)';
 COMMENT ON COLUMN students.student_roll_no IS 'Unique student roll number for academic identification';
 COMMENT ON COLUMN students.student_status IS 'Current status of the student enrollment';
+COMMENT ON COLUMN students.version IS 'Version number for optimistic locking to handle concurrent updates';
