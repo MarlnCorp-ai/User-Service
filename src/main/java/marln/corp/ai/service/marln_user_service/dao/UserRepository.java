@@ -23,6 +23,7 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE u.isDeleted = false AND u.isActive = true")
     List<User> findAllActiveUsers();
 
+    @Query("SELECT u.passwordHash FROM User u WHERE u.email = :email")
     Optional<String> findPasswordByEmail(@Param("email")String email);
 
     @Modifying

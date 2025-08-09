@@ -2,6 +2,7 @@ package marln.corp.ai.service.marln_user_service.service;
 
 import ch.qos.logback.classic.Logger;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import marln.corp.ai.service.marln_user_service.assembler.UserMapper;
 import marln.corp.ai.service.marln_user_service.dao.UserRepository;
@@ -113,6 +114,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String changePassword(PasswordChangeDTO passwordChangeDTO) {
 
         String currentPasswordHash = userRepository.findPasswordByEmail(passwordChangeDTO.getEmailId()).orElseThrow(
