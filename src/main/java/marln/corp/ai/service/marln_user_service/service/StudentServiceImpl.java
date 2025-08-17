@@ -204,6 +204,15 @@ public class StudentServiceImpl implements StudentService{
                     studentRepository.save(student); // Second save operation
 
                     successfulEmails.add(csvStudent.getEmail());
+                    //Assign roles to user
+                    try {
+                        restCall.assignRoles(savedUser.getId(), csvStudent.getUserRole(), csvStudent.getUserPermissions());
+                    } catch (Exception ex) {
+                        userRepository.delete(user);
+                        studentRepository.delete(student);
+                        throw new ExternalServiceException("marln-rbac-service", "Failed to assign roles to user: " + ex.getMessage(), ex);
+                    }
+
                     log.info("Successfully created student: {}", csvStudent.getEmail());
 
                 } catch (Exception e) {

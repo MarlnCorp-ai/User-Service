@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import marln.corp.ai.service.marln_user_service.dto.BulkUploadResponseDto;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
 import marln.corp.ai.service.marln_user_service.dto.EmployeeHierarchyDTO;
+import marln.corp.ai.service.marln_user_service.dto.EmployeeUpdateDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -17,8 +18,8 @@ public interface EmployeeService {
         List<EmployeeDTO> getEmployeesByDesignation(String designation);
 
         List<EmployeeDTO> getAllEmployees();
-        EmployeeDTO updateEmployee(String id, EmployeeDTO dto);
+        EmployeeDTO updateEmployee(String id, EmployeeUpdateDTO employeeUpdateDTO);
         void deleteEmployee(String id);
          EmployeeHierarchyDTO getEmployeeHierarchy(String employeeId);
-        public BulkUploadResponseDto uploadEmployeesFromCsv(MultipartFile file);
+         BulkUploadResponseDto uploadEmployeesFromCsv(MultipartFile file);
 }

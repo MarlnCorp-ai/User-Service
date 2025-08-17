@@ -1,9 +1,7 @@
 package marln.corp.ai.service.marln_user_service.controller;
 
 import lombok.RequiredArgsConstructor;
-import marln.corp.ai.service.marln_user_service.dto.BulkUploadResponseDto;
-import marln.corp.ai.service.marln_user_service.dto.EmployeeDTO;
-import marln.corp.ai.service.marln_user_service.dto.EmployeeHierarchyDTO;
+import marln.corp.ai.service.marln_user_service.dto.*;
 import marln.corp.ai.service.marln_user_service.service.EmployeeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,8 +47,8 @@ public class EmployeeController {
     @PutMapping("/{userId}")
     public ResponseEntity<EmployeeDTO> updateEmployee(
             @PathVariable String userId,
-            @Valid @RequestBody EmployeeDTO employeeDTO) {
-        EmployeeDTO updated = employeeService.updateEmployee(userId, employeeDTO);
+            @Valid @RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
+        EmployeeDTO updated = employeeService.updateEmployee(userId, employeeUpdateDTO);
         return ResponseEntity.ok(updated);
     }
 

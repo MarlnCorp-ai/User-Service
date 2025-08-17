@@ -135,11 +135,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     @Override
-    public EmployeeDTO updateEmployee(String userId, EmployeeDTO employeeDTO) {
+    public EmployeeDTO updateEmployee(String userId, EmployeeUpdateDTO employeeUpdateDTO) {
         Employee existingEmployee = employeeRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Employee not found with user ID: " + userId));
 
-        employeeMapper.updateEmployeeEntityFromDto(employeeDTO, existingEmployee);
+        employeeMapper.updateEmployeeEntityFromDto(employeeUpdateDTO, existingEmployee);
         existingEmployee.setUpdatedAt(LocalDateTime.now());
 
         Employee updatedEmployee = employeeRepository.save(existingEmployee);
@@ -159,7 +159,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
-
 
     @Transactional
     @Override
@@ -266,8 +265,16 @@ public class EmployeeServiceImpl implements EmployeeService {
                     employee.setCreatedAt(LocalDateTime.now());
 
                     employeeRepository.save(employee); // Second save operation
-
                     successfulEmails.add(csvEmployee.getEmail());
+                    //Assign roles to user
+                    try {
+                        restCall.assignRoles(savedUser.getId(), csvEmployee.getUserRole(), csvEmployee.getUserPermissions());
+                    } catch (Exception ex) {
+                        userRepository.delete(user);
+                        employeeRepository.delete(employee);
+                        throw new ExternalServiceException("marln-rbac-service", "Failed to assign roles to user: " + ex.getMessage(), ex);
+                    }
+
                     log.info("Successfully created employee: {}", csvEmployee.getEmail());
 
                 } catch (Exception e) {

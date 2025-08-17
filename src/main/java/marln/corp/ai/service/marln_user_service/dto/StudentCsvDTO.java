@@ -1,11 +1,13 @@
 package marln.corp.ai.service.marln_user_service.dto;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +22,8 @@ public class StudentCsvDTO {
     private String userLastName;
     private String password;
     private String createdBy;
+    private String userRole;
+    private List<String> userPermissions;
 
     // Student fields
     private String studentRollNo;
@@ -31,4 +35,5 @@ public class StudentCsvDTO {
     private String academicYear;
     private Integer semester;
     private String departmentId;
+
 }

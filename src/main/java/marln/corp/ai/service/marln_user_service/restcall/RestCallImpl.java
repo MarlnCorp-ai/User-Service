@@ -1,6 +1,7 @@
 package marln.corp.ai.service.marln_user_service.restcall;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import marln.corp.ai.service.marln_user_service.dto.UserRoleRequestDto;
 import marln.corp.ai.service.marln_user_service.exception.ExternalServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
+@Slf4j
 @Component
 public class RestCallImpl implements RestCall{
 
@@ -21,6 +23,7 @@ public class RestCallImpl implements RestCall{
     @Override
     public void assignRoles(String userId, String roleId, List<String> permissionList) {
 try {
+    log.info("UserId : ,{}, RoleId : {}, Permissions : {}",userId, roleId, permissionList);
     String url = "http://marln-rbac-service/rbac/user";
     UserRoleRequestDto userRoleRequestDto = new UserRoleRequestDto();
     HttpHeaders headers = new HttpHeaders();
