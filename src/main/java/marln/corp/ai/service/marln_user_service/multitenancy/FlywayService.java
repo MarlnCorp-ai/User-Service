@@ -29,9 +29,11 @@ public class FlywayService {
 
 	public void migrateTenant (String tenantId) {
 		String schemaName = Objects.requireNonNullElse(tenantId, DEFAULT_SCHEMA) + "_" + (!StringUtils.isEmpty(this.schemaName) ? this.schemaName : applicationName);
-		log.debug("Schema Name:" + schemaName);
+		schemaName = schemaName.toLowerCase();
+		log.info("Schema Name:" + schemaName);
 		try (Connection conn = dataSource.getConnection();
 		     Statement stmt = conn.createStatement()) {
+			log.info("Creating schema - {}", schemaName);
 			stmt.execute("CREATE SCHEMA IF NOT EXISTS " + schemaName);
 		} catch (Exception e) {
 			log.error("Failed to create schema for tenant - {}", tenantId);
