@@ -36,49 +36,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestToken = request.getHeader("Authorization");
         String userName = null;
         String token = null;
-        if( requestToken!=null && requestToken.startsWith("Bearer"))
-        {
-            token = requestToken.substring(7);
-            try {
-                userName = jwtTokenHelper.getUserNameFromToken(token);
-            }catch (IllegalArgumentException e)
-            {
-                System.out.println("IllegalArgumentException : " +e.getMessage());
-                throw new InvalidTokenException("Invalid token format");
-            }
-            catch (ExpiredJwtException e)
-            {
-                System.out.println("ExpiredJwtException : " +e.getMessage());
-                throw new InvalidTokenException("Token has expired");
-            }
-            catch (MalformedJwtException e)
-            {
-                System.out.println("MalformedJwtException : " +e.getMessage());
-                throw new InvalidTokenException("Malformed token");
-            }
-        }else {
-            System.out.println("JWT Token does not starts with Bearer");
-        }
-        //once we have retrived the token, we will validate now
-
-        if(userName!=null && SecurityContextHolder.getContext().getAuthentication() ==null)
-        {
-            UserDetails userDetails = null/*userDetailsService.loadUserByUsername(userName)*/;
-            if(jwtTokenHelper.validateToken(token, userDetails))
-            {
-                //the token is valid and now we will authenticate
-
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= new UsernamePasswordAuthenticationToken(userName, null, null);
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-            else {
-                System.out.println("Invalid token");
-                throw new InvalidTokenException("Token validation failed");
-            }
-        }else {
-            System.out.println("Username is null or context is not null");
-        }
+//        if( requestToken!=null && requestToken.startsWith("Bearer"))
+//        {
+//            token = requestToken.substring(7);
+//            try {
+//                userName = jwtTokenHelper.getUserNameFromToken(token);
+//            }catch (IllegalArgumentException e)
+//            {
+//                System.out.println("IllegalArgumentException : " +e.getMessage());
+//                throw new InvalidTokenException("Invalid token format");
+//            }
+//            catch (ExpiredJwtException e)
+//            {
+//                System.out.println("ExpiredJwtException : " +e.getMessage());
+//                throw new InvalidTokenException("Token has expired");
+//            }
+//            catch (MalformedJwtException e)
+//            {
+//                System.out.println("MalformedJwtException : " +e.getMessage());
+//                throw new InvalidTokenException("Malformed token");
+//            }
+//        }else {
+//            System.out.println("JWT Token does not starts with Bearer");
+//        }
+//        //once we have retrived the token, we will validate now
+//
+//        if(userName!=null && SecurityContextHolder.getContext().getAuthentication() ==null)
+//        {
+//            UserDetails userDetails = null/*userDetailsService.loadUserByUsername(userName)*/;
+//            if(jwtTokenHelper.validateToken(token, userDetails))
+//            {
+//                //the token is valid and now we will authenticate
+//
+//                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken= new UsernamePasswordAuthenticationToken(userName, null, null);
+//                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+//            }
+//            else {
+//                System.out.println("Invalid token");
+//                throw new InvalidTokenException("Token validation failed");
+//            }
+//        }else {
+//            System.out.println("Username is null or context is not null");
+//        }
 
        filterChain.doFilter(request,response);
     }
