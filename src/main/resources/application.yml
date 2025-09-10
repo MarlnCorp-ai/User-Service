@@ -4,9 +4,9 @@ spring:
 
   datasource:
     platform: postgres
-    url: jdbc:postgresql://marln-database-dev.c7usmyc2yoib.ap-south-1.rds.amazonaws.com:5432/postgres
-    username: MarlnDev
-    password: Password01
+    url: jdbc:postgresql://marln-trial-database.c5ew6uekogft.me-central-1.rds.amazonaws.com:5432/postgres
+    username: marlntrial
+    password: Mangaldoi#25
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -32,7 +32,7 @@ eureka:
   client:
     fetch-registry: true
     service-url:
-      defaultZone: http://ec2-13-233-240-95.ap-south-1.compute.amazonaws.com:8761/eureka
+      defaultZone: http://ec2-40-172-116-146.me-central-1.compute.amazonaws.com:8761/eureka
 
 logging:
   file:
