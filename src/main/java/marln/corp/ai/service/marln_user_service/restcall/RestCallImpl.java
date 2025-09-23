@@ -23,11 +23,12 @@ public class RestCallImpl implements RestCall{
     @Override
     public void assignRoles(String userId, String roleId, List<String> permissionList) {
 try {
-    log.info("UserId : ,{}, RoleId : {}, Permissions : {}",userId, roleId, permissionList);
+    log.info("UserId : {}, RoleId : {}, Permissions : {}",userId, roleId, permissionList);
     String url = "http://marln-rbac-service/rbac/user";
     UserRoleRequestDto userRoleRequestDto = new UserRoleRequestDto();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("tenantId", request.getHeader("tenantId"));
     userRoleRequestDto.setUserId(userId);
     userRoleRequestDto.setRoleId(roleId);
     userRoleRequestDto.setPermissionIds(permissionList);
