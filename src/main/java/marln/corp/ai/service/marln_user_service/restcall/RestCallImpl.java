@@ -28,6 +28,8 @@ try {
     UserRoleRequestDto userRoleRequestDto = new UserRoleRequestDto();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.set("tenantId", request.getHeader("tenantId"));
+    headers.set("userId",request.getHeader("userId"));
     userRoleRequestDto.setUserId(userId);
     userRoleRequestDto.setRoleId(roleId);
     userRoleRequestDto.setPermissionIds(permissionList);
