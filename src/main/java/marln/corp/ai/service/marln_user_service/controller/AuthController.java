@@ -47,7 +47,6 @@ public class AuthController {
         authenticate(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
         UserDetails userDetails =  userDetailsService.loadUserByUsername(loginRequestDTO.getEmail());
         System.out.println("userEmail : " + userDetails.getUsername());
-        System.out.println("userPassword : " + userDetails.getPassword());
         String token = this.jwtTokenHelper.generateToken(userDetails);
         // Cast UserDetails to User to get the ID
         User user = (User) userDetails;
